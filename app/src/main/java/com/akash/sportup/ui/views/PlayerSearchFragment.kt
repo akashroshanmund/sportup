@@ -1,6 +1,7 @@
 package com.akash.sportup.ui.views
 
-import android.graphics.Color
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -17,10 +19,9 @@ import com.akash.sportup.R
 import com.akash.sportup.databinding.FragmentPlayerSearchBinding
 import com.akash.sportup.ui.utils.PicassoCircleTransformation
 import com.akash.sportup.ui.viewmodels.PlayerSearchViewModel
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.squareup.picasso.Picasso
-import com.squareup.picasso.Transformation
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -48,6 +49,8 @@ class PlayerSearchFragment : Fragment() {
 
     lateinit var progressBarView : RelativeLayout
     lateinit var linearTeamSearch : LinearLayout
+
+    lateinit var rlPlayerNoResult: RelativeLayout
     
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -91,10 +94,17 @@ class PlayerSearchFragment : Fragment() {
         this.imgPlayerBackground = rootView.findViewById(R.id.imgPlayerBackground)
         this.linearTeamSearch = rootView.findViewById(R.id.linearPlayerSearch)
         this.progressBarView = rootView.findViewById(R.id.progressPlayerSearch)
+        this.rlPlayerNoResult = rootView.findViewById(R.id.rlPlayerNoResult)
+
         linearTeamSearch.visibility = View.GONE
         progressBarView.visibility = View.VISIBLE
-        lifecycleScope.launch{
-            playerSearchViewModel.fetchPlayerSearchResult("Ronaldo")
+
+        if(isInternetAvailable()) {
+            lifecycleScope.launch {
+                playerSearchViewModel.fetchPlayerSearchResult("Messi")
+            }
+        }else{
+            Toast.makeText(activity, "No Internet", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -102,10 +112,14 @@ class PlayerSearchFragment : Fragment() {
         val searchView: SearchView = rootView.findViewById(R.id.svSearchPlayer)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(name: String): Boolean {
-                linearTeamSearch.visibility = View.GONE
-                progressBarView.visibility = View.VISIBLE
-                lifecycleScope.launch{
-                    playerSearchViewModel.fetchPlayerSearchResult(name)
+                if(isInternetAvailable()) {
+                    linearTeamSearch.visibility = View.GONE
+                    progressBarView.visibility = View.VISIBLE
+                    lifecycleScope.launch {
+                        playerSearchViewModel.fetchPlayerSearchResult(name)
+                    }
+                }else{
+                    Toast.makeText(activity, "No Internet", Toast.LENGTH_LONG).show()
                 }
                 return false
             }
@@ -123,6 +137,16 @@ class PlayerSearchFragment : Fragment() {
             showRoundImage(imgPlayerTeamLogo, it.data?.playerDetails?.playersList?.get(0)?.strThumb)
             linearTeamSearch.visibility = View.VISIBLE
             progressBarView.visibility = View.GONE
+
+            Log.i("ApiTestInvalid", it.data?.playerDetails?.playersList?.get(0)?.idPlayer +" result ")
+            if(it.data?.playerDetails?.playersList?.get(0)?.idPlayer == null|| it.data == null){
+                rlPlayerNoResult.visibility = View.VISIBLE
+                linearTeamSearch.visibility = View.GONE
+            }else{
+                rlPlayerNoResult.visibility = View.GONE
+                linearTeamSearch.visibility = View.VISIBLE
+
+            }
             //showImage(imgPlayerBackground, it.data?.playerDetails?.playersList?.get(0)?.strBanner)
            // nextEventAdapter.updateData(it.data?.lastEvents?.eventList)
         }
@@ -146,6 +170,13 @@ class PlayerSearchFragment : Fragment() {
             .noFade()
             .into(targetImageView)
     }
+
+    fun isInternetAvailable(): Boolean {
+        var connectivityManager : ConnectivityManager  = ( activity?.getSystemService(Context.CONNECTIVITY_SERVICE)) as ConnectivityManager;
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo()!!
+            .isConnected();
+    }
+
 
     companion object {
         /**

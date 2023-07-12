@@ -1,5 +1,7 @@
 package com.akash.sportup.ui.views
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -10,6 +12,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import android.widget.ScrollView
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +25,7 @@ import com.akash.sportup.ui.utils.PicassoCircleTransformation
 import com.akash.sportup.ui.viewmodels.TeamSearchViewModel
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.launch
+import java.net.InetAddress
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -50,6 +54,7 @@ class TeamSearchFragment : Fragment() {
 
     lateinit var rlProgressView : RelativeLayout
     lateinit var scrollTeamSearch : ScrollView
+    lateinit var rlTeamrNoResult : RelativeLayout
 
 
 
@@ -82,8 +87,13 @@ class TeamSearchFragment : Fragment() {
 
         setObservatationActions()
         defineUI()
-        lifecycleScope.launch{
-            teamSearchViewModel.fetchTeamSearchResult("Chelsea")
+
+        if(isInternetAvailable()) {
+            lifecycleScope.launch {
+                teamSearchViewModel.fetchTeamSearchResult("Chelsea")
+            }
+        }else{
+            Toast.makeText(activity, "No Internet", Toast.LENGTH_LONG).show()
         }
 
     }
@@ -94,6 +104,7 @@ class TeamSearchFragment : Fragment() {
         imgTeamLogo = rootView.findViewById(R.id.imgTeamLogo)
         scrollTeamSearch = rootView.findViewById(R.id.scrollTeamSearch)
         rlProgressView = rootView.findViewById(R.id.progressLayout)
+        rlTeamrNoResult = rootView.findViewById(R.id.rlTeamNoResult)
 
         rlProgressView.visibility = View.VISIBLE
         scrollTeamSearch.visibility = View.GONE
@@ -120,16 +131,17 @@ class TeamSearchFragment : Fragment() {
         val searchView: SearchView = rootView.findViewById(R.id.svTeamSearch)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(name: String): Boolean {
-                lifecycleScope.launch{
-                    teamSearchViewModel.fetchTeamSearchResult(name)
-                }
+
+                if (isInternetAvailable()){
+                    lifecycleScope.launch {
+                        teamSearchViewModel.fetchTeamSearchResult(name)
+                    }
 
                 rlProgressView.visibility = View.VISIBLE
                 scrollTeamSearch.visibility = View.GONE
-                val handler = Handler()
-                handler.postDelayed({ // Do something after 5s = 5000ms
-
-                }, 5000)
+            }else{
+                    Toast.makeText(activity, "No Internet", Toast.LENGTH_LONG).show()
+                }
 
                 return false
             }
@@ -149,10 +161,22 @@ class TeamSearchFragment : Fragment() {
             lastEventAdapter.updateData(it.data?.lastEvents?.eventList)
             nextEventAdapter.updateData(it.data?.nextEvents?.eventList)
             showImage(imgTeamLogo,it.data?.teamDetails?.teamsList?.get(0)?.strTeamBadge)
+
+
             rlProgressView.visibility = View.GONE
             scrollTeamSearch.visibility = View.VISIBLE
+
+            if(it.data?.teamDetails?.teamsList?.get(0)?.idTeam == null || it.data == null){
+                rlTeamrNoResult.visibility = View.VISIBLE
+                scrollTeamSearch.visibility = View.GONE
+            }else{
+                rlTeamrNoResult.visibility = View.GONE
+                scrollTeamSearch.visibility = View.VISIBLE
+            }
         }
     }
+
+
 
     private fun defineRecyclerView(){
 
@@ -167,6 +191,12 @@ class TeamSearchFragment : Fragment() {
             .noFade()
             .transform(PicassoCircleTransformation())
             .into(targetImageView)
+    }
+
+    fun isInternetAvailable(): Boolean {
+        var connectivityManager : ConnectivityManager = ( activity?.getSystemService(Context.CONNECTIVITY_SERVICE)) as ConnectivityManager;
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo()!!
+            .isConnected();
     }
 
 

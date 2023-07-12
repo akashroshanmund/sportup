@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="@drawable/sportbackground"
     tools:context=".ui.views.MainActivity">
 
     <FrameLayout
@@ -23,12 +24,12 @@
         app:labelVisibilityMode="labeled"
         app:menu="@menu/search_option_menu">
     </com.google.android.material.bottomnavigation.BottomNavigationView>
-<!--
+
     <include
-        android:id="@+id/adView"
-        layout="@layout/adview_banner"
+        android:id="@+id/adBanner"
+        layout="@layout/adbanner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
-        -->
+
 
 </RelativeLayout>

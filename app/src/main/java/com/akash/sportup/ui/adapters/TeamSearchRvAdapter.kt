@@ -78,13 +78,14 @@ class TeamSearchRvAdapter : RecyclerView.Adapter<TeamSearchRvAdapter.EventViewHo
             tvTeamName1.text = item.strHomeTeam
             tvTeamName2.text = item.strAwayTeam
             tvTeamScore.text = item.intHomeScore +" : " +item.intAwayScore
-            Picasso
-                .get()
-                .load(item.strThumb)
-                .fit()
-                .noFade()
-                .into(imEventCard)
-
+            if(item.strThumb != "") {
+                Picasso
+                    .get()
+                    .load(item.strThumb)
+                    .fit()
+                    .noFade()
+                    .into(imEventCard)
+            }
 
 
 
@@ -107,8 +108,6 @@ class TeamSearchRvAdapter : RecyclerView.Adapter<TeamSearchRvAdapter.EventViewHo
         }*/
     }
 
-     fun showImage(targetImageView: ImageView?, path: String?) {
 
-    }
 }
 

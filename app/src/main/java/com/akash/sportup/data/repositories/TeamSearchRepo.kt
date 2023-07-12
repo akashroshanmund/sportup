@@ -29,38 +29,41 @@ class TeamSearchRepo(_SportsDBClient: SportsDBApi) {
     }
 
     private fun fetchTeamDetails(name : String){
-        Log.i("ApiTest", "FetchTeamCalled")
+        Log.i("ApiTestPlayer", "FetchTeamCalled")
         teamsDataResponse = Results.Loading()
         val call: Call<TeamApiModel> = sportsDBClient.getTeamsData(name)
         call.enqueue(object : Callback<TeamApiModel?> {
             override fun onResponse(call: Call<TeamApiModel?>, response: Response<TeamApiModel?>) {
                 if (response.isSuccessful) {
-                    Log.i("ApiTest", "TeamFetch Success")
+                    Log.i("ApiTestPlayer", "TeamFetch Success")
                     teamsDataResponse = Results.Success(response.body())
                     val teamId = response.body()?.teamsList?.get(0)?.idTeam
-                    Log.i("ApiTest", "TeamId ${response.body()?.teamsList?.get(0)?.idTeam}")
+                    Log.i("ApiTestPlayer", "TeamId ${response.body()?.teamsList?.get(0)?.idTeam}")
                     fetchLastEvents(teamId)
                     fetchNextEvents(teamId)
 
                 } else {
-                    Log.i("ApiTest", "Team Fetch Failed")
+                    Log.i("ApiTestPlayer", "Team Fetch Failed")
                     teamsDataResponse = Results.Error(response.message())
                 }
             }
 
             override fun onFailure(call: Call<TeamApiModel?>, t: Throwable) {
                 teamsDataResponse = Results.Error(t.message)
+                lastEventsDataResponse = Results.Error(t.message)
+                nextEventsDataResponse = Results.Error(t.message)
+                loadTeamSearchUiState()
             }
         })
     }
 
     private fun fetchLastEvents(id : String?){
         lastEventsDataResponse = Results.Loading()
-        Log.i("ApiTest", "last event called")
+        Log.i("ApiTestPlayer", "last event called")
         val call: Call<EventsApiModel> = sportsDBClient.getLastEventsData(id)
         call.enqueue(object : Callback<EventsApiModel?> {
             override fun onResponse(call: Call<EventsApiModel?>, response: Response<EventsApiModel?>) {
-                Log.i("ApiTest", "last event Success"+response.message()+" j")
+                Log.i("ApiTestPlayer", "last event Success"+response.message()+" j")
                 lastEventsDataResponse = if (response.isSuccessful) {
                     Results.Success(response.body())
                 } else {
@@ -70,19 +73,21 @@ class TeamSearchRepo(_SportsDBClient: SportsDBApi) {
             }
 
             override fun onFailure(call: Call<EventsApiModel?>, t: Throwable) {
-                Log.i("ApiTest", "last event failed")
+                Log.i("ApiTestPlayer", "last event failed")
                 lastEventsDataResponse = Results.Error(t.message)
+
+                loadTeamSearchUiState()
             }
         })
     }
 
     private fun fetchNextEvents(id : String?){
-        Log.i("ApiTest", "next event called")
+        Log.i("ApiTestPlayer", "next event called")
         nextEventsDataResponse = Results.Loading()
         val call: Call<EventsApiModel> = sportsDBClient.getNextEventsData(id)
         call.enqueue(object : Callback<EventsApiModel?> {
             override fun onResponse(call: Call<EventsApiModel?>, response: Response<EventsApiModel?>) {
-                Log.i("ApiTest", "next event Success")
+                Log.i("ApiTestPlayer", "next event Success")
                 nextEventsDataResponse = if (response.isSuccessful) {
                     Results.Success(response.body())
                 } else {
@@ -91,8 +96,9 @@ class TeamSearchRepo(_SportsDBClient: SportsDBApi) {
                 loadTeamSearchUiState()
             }
             override fun onFailure(call: Call<EventsApiModel?>, t: Throwable) {
-                Log.i("ApiTest", "next Event Failed")
+                Log.i("ApiTestPlayer", "next Event Failed")
                 nextEventsDataResponse = Results.Error(t.message)
+                loadTeamSearchUiState()
             }
         })
     }
@@ -102,6 +108,10 @@ class TeamSearchRepo(_SportsDBClient: SportsDBApi) {
         if((lastEventsDataResponse?.hasResult == true && nextEventsDataResponse?.hasResult == true)){
             teamSearchUIStateResult.value = Results.Success(TeamSearchUiState(teamsDataResponse?.data, lastEventsDataResponse?.data, nextEventsDataResponse?.data))
         }
+    }
+
+    public fun getTeamUiStateData() : MutableLiveData<Results<TeamSearchUiState>>{
+        return this.teamSearchUIStateResult
     }
 
 

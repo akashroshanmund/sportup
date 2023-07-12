@@ -22,5 +22,5 @@ interface SportsDBApi {
     fun getPlayersData(@Query("p") p : String) : Call<PlayerApiModel>
 
     @GET("lookupmilestones.php?")
-    fun getPlayersMilestonesData(@Query("id") id : String) : Call<PlayerMilestoneApiModel>
+    fun getPlayersMilestonesData(@Query("id") id : String?) : Call<PlayerMilestoneApiModel>
 }

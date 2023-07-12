@@ -65,8 +65,8 @@ class PlayerSearchFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
 
+        // Inflate the layout for this fragment
         playerSearchViewModel = ViewModelProvider(this)[PlayerSearchViewModel::class.java]
         PlayerSearchFragmentBinding = FragmentPlayerSearchBinding.inflate(inflater, container, false)
         rootView = PlayerSearchFragmentBinding.root
@@ -82,6 +82,7 @@ class PlayerSearchFragment : Fragment() {
             viewModel = playerSearchViewModel
         }
         PlayerSearchFragmentBinding?.playerSearchFragment = this
+
         setObservatationActions()
         defineUI()
         searchOperation()
@@ -99,6 +100,7 @@ class PlayerSearchFragment : Fragment() {
         linearTeamSearch.visibility = View.GONE
         progressBarView.visibility = View.VISIBLE
 
+
         if(isInternetAvailable()) {
             lifecycleScope.launch {
                 playerSearchViewModel.fetchPlayerSearchResult("Messi")
@@ -112,6 +114,7 @@ class PlayerSearchFragment : Fragment() {
         val searchView: SearchView = rootView.findViewById(R.id.svSearchPlayer)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(name: String): Boolean {
+
                 if(isInternetAvailable()) {
                     linearTeamSearch.visibility = View.GONE
                     progressBarView.visibility = View.VISIBLE
@@ -121,6 +124,7 @@ class PlayerSearchFragment : Fragment() {
                 }else{
                     Toast.makeText(activity, "No Internet", Toast.LENGTH_LONG).show()
                 }
+
                 return false
             }
 
@@ -139,6 +143,7 @@ class PlayerSearchFragment : Fragment() {
             progressBarView.visibility = View.GONE
 
             Log.i("ApiTestInvalid", it.data?.playerDetails?.playersList?.get(0)?.idPlayer +" result ")
+
             if(it.data?.playerDetails?.playersList?.get(0)?.idPlayer == null|| it.data == null){
                 rlPlayerNoResult.visibility = View.VISIBLE
                 linearTeamSearch.visibility = View.GONE
@@ -147,8 +152,6 @@ class PlayerSearchFragment : Fragment() {
                 linearTeamSearch.visibility = View.VISIBLE
 
             }
-            //showImage(imgPlayerBackground, it.data?.playerDetails?.playersList?.get(0)?.strBanner)
-           // nextEventAdapter.updateData(it.data?.lastEvents?.eventList)
         }
     }
 
@@ -159,15 +162,6 @@ class PlayerSearchFragment : Fragment() {
             .fit()
             .noFade()
             .transform(PicassoCircleTransformation())
-            .into(targetImageView)
-    }
-
-    protected fun showImage(targetImageView: ImageView?, path: String?) {
-        Picasso
-            .get()
-            .load(path)
-            .fit()
-            .noFade()
             .into(targetImageView)
     }
 

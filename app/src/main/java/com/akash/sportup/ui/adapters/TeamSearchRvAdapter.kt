@@ -50,14 +50,12 @@ class TeamSearchRvAdapter : RecyclerView.Adapter<TeamSearchRvAdapter.EventViewHo
 
     class EventViewHolder(itemView: View, private val mContext: Context?) :
         RecyclerView.ViewHolder(itemView) {
-        private val tvEventStadium : TextView
+        private val tvEventStadium: TextView
         private val tvEventDate: TextView
-        private val tvTeamName1 : TextView
-        private val tvTeamName2 : TextView
-        private val tvTeamScore : TextView
-        private val imEventCard : ImageView
-
-
+        private val tvTeamName1: TextView
+        private val tvTeamName2: TextView
+        private val tvTeamScore: TextView
+        private val imEventCard: ImageView
 
 
         init {
@@ -69,7 +67,6 @@ class TeamSearchRvAdapter : RecyclerView.Adapter<TeamSearchRvAdapter.EventViewHo
             imEventCard = itemView.findViewById(R.id.imEventCard)
 
 
-
         }
 
         fun bindData(item: Events) {
@@ -77,8 +74,8 @@ class TeamSearchRvAdapter : RecyclerView.Adapter<TeamSearchRvAdapter.EventViewHo
             tvEventDate.text = item.strTimeLocal
             tvTeamName1.text = item.strHomeTeam
             tvTeamName2.text = item.strAwayTeam
-            tvTeamScore.text = item.intHomeScore +" : " +item.intAwayScore
-            if(item.strThumb != "") {
+            tvTeamScore.text = item.intHomeScore + " : " + item.intAwayScore
+            if (item.strThumb != "") {
                 Picasso
                     .get()
                     .load(item.strThumb)
@@ -88,24 +85,7 @@ class TeamSearchRvAdapter : RecyclerView.Adapter<TeamSearchRvAdapter.EventViewHo
             }
 
 
-
-            /*val strThumb: String = item.getStrThumb()
-            if (strThumb != null && !strThumb.isEmpty()) {
-                resultsHomeTeam.setBackgroundResource(R.color.transparent)
-                loadImage(resultsHomeTeam, strThumb)
-            } else {
-                resultsHomeTeam.background =
-                    ContextCompat.getDrawable(mContext!!, R.drawable.card_bg)
-                resultsHomeTeam.setImageResource(R.color.transparent)
-            }*/
         }
-
-       /* private fun loadImage(targetImageView: ImageView, url: String) {
-            Glide.with(mContext)
-                .load(url)
-                .optionalFitCenter()
-                .into(targetImageView)
-        }*/
     }
 
 

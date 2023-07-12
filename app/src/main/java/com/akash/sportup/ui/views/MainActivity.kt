@@ -11,20 +11,23 @@ import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.AdView
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        var adBanner : AdView
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
 
-
-
-        //To hide the title bar in the activity
         requestWindowFeature(Window.FEATURE_NO_TITLE)
         supportActionBar!!.hide()
         setContentView(R.layout.activity_main)
+
+        /** Integrate google analytics */
+        var firebaseAnalytics  = FirebaseAnalytics.getInstance(this)
+        val bundle = Bundle()
+        bundle.putString(FirebaseAnalytics.Param.ITEM_ID,"SportUp Interaction Log")
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,bundle)
 
         val bottomNavigationView = findViewById<View>(R.id.navBar_Btm) as BottomNavigationView
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
@@ -32,11 +35,14 @@ class MainActivity : AppCompatActivity() {
                 R.id.action_teamSearch -> {
                     val teamSearchFragment: TeamSearchFragment = TeamSearchFragment()
                     openFragment(teamSearchFragment)
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,bundle)
+
                 }
 
                 R.id.action_playerSearch -> {
                     val playerSearchFragment = PlayerSearchFragment()
                     openFragment((playerSearchFragment))
+                    firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT,bundle)
                 }
 
 
@@ -44,9 +50,10 @@ class MainActivity : AppCompatActivity() {
             true
         }
         bottomNavigationView.selectedItemId = R.id.action_playerSearch
-        MobileAds.initialize(this) {}
 
-        adBanner = findViewById(R.id.adBanner)
+        /** Add ad to the main activity*/
+        MobileAds.initialize(this) {}
+        var adBanner : AdView = findViewById(R.id.adBanner)
         var token : AdRequest = AdRequest.Builder().build()
         adBanner.loadAd(token)
 
@@ -59,9 +66,9 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    override fun onBackPressed() {
-        finish()
-    }
+        override fun onBackPressed() {
+            finish()
+        }
     }
 
 

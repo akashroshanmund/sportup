@@ -71,6 +71,7 @@ class TeamSearchFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
         teamSearchViewModel = ViewModelProvider(this)[TeamSearchViewModel::class.java]
         TeamSearchFragmentBinding = FragmentTeamSearchBinding.inflate(inflater, container, false)
         rootView = TeamSearchFragmentBinding.root
@@ -79,6 +80,7 @@ class TeamSearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        /**  create view binding */
         TeamSearchFragmentBinding?.apply {
             lifecycleOwner = viewLifecycleOwner
             viewModel = teamSearchViewModel
@@ -127,6 +129,8 @@ class TeamSearchFragment : Fragment() {
 
         rvTeamNextEvents.adapter = nextEventAdapter
         rvTeamLastEvents.adapter = lastEventAdapter
+
+        /** Search view operation handling */
 
         val searchView: SearchView = rootView.findViewById(R.id.svTeamSearch)
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
@@ -178,9 +182,7 @@ class TeamSearchFragment : Fragment() {
 
 
 
-    private fun defineRecyclerView(){
 
-    }
 
     protected fun showImage(targetImageView: ImageView?, path: String?) {
 

@@ -26,6 +26,7 @@ class PlayerSearchRepo(_SportsDBClient: SportsDBApi) {
         this.sportsDBClient = _SportsDBClient
     }
 
+    /** Fetch the player result on request*/
     suspend fun fetchPlayerSearchResult(name : String){
         fetchPlayerDetails(name);
     }
